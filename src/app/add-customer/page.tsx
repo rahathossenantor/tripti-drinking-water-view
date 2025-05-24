@@ -29,6 +29,10 @@ const AddCustomer = () => {
         values.productPrice = Number(values.productPrice);
         const toastId = toast.loading("Creating customer...");
 
+        if (!values.email) {
+            delete values.email;
+        };
+
         try {
             const res = await createCustomer(values).unwrap();
             toast.success(res?.message, { id: toastId, duration: 2000 });
@@ -60,7 +64,6 @@ const AddCustomer = () => {
                                 // resolver={zodResolver(customerSchema)}
                                 defaultValues={{
                                     name: "",
-                                    email: "",
                                     phone: "",
                                     productPrice: 0,
                                     deliveryAddress: "",

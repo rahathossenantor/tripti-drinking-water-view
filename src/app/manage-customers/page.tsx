@@ -136,68 +136,59 @@ const ManageCustomers = () => {
                                         </IconButton>
                                     </TableCell>
                                     <TableCell>
-                                        <IconButton
-                                            size="medium"
-                                            color="primary"
-                                            className="mr-2"
-                                            onClick={() => {
-                                                // Handle edit
-                                            }}
+                                        <Button onClick={handleOpen}>Give Water</Button>
+                                        <Modal
+                                            open={open}
+                                            onClose={handleClose}
+                                            aria-labelledby="modal-modal-title"
+                                            aria-describedby="modal-modal-description"
                                         >
-                                            <Button onClick={handleOpen}>Give Water</Button>
-                                            <Modal
-                                                open={open}
-                                                onClose={handleClose}
-                                                aria-labelledby="modal-modal-title"
-                                                aria-describedby="modal-modal-description"
-                                            >
-                                                <Box sx={style}>
-                                                    <FormWrapper
-                                                        onSubmit={onSubmit}
-                                                        defaultValues={{
-                                                            quantity: 1,
-                                                            paymentStatus: "Due",
-                                                            customer: customer._id,
-                                                            price: customer.productPrice,
-                                                        }}
+                                            <Box sx={style}>
+                                                <FormWrapper
+                                                    onSubmit={onSubmit}
+                                                    defaultValues={{
+                                                        quantity: 1,
+                                                        paymentStatus: "Due",
+                                                        customer: customer._id,
+                                                        price: customer.productPrice,
+                                                    }}
+                                                >
+                                                    <Typography variant="h6" component="h2">
+                                                        Provide Water
+                                                    </Typography>
+                                                    <Box className="flex flex-col gap-4 my-4">
+                                                        <InputWrapper
+                                                            name="quantity"
+                                                            label="Quantity"
+                                                            type="number"
+                                                            required
+                                                        />
+                                                        <InputSelectWrapper
+                                                            name="paymentStatus"
+                                                            label="Payment Status"
+                                                            items={["Paid", "Due"]}
+                                                            required
+                                                        />
+                                                    </Box>
+                                                    <Button
+                                                        variant="contained"
+                                                        type="submit"
+                                                        color="primary"
+                                                        className="mt-4"
                                                     >
-                                                        <Typography variant="h6" component="h2">
-                                                            Provide Water
-                                                        </Typography>
-                                                        <Box className="flex flex-col gap-4 my-4">
-                                                            <InputWrapper
-                                                                name="quantity"
-                                                                label="Quantity"
-                                                                type="number"
-                                                                required
-                                                            />
-                                                            <InputSelectWrapper
-                                                                name="paymentStatus"
-                                                                label="Payment Status"
-                                                                items={["Paid", "Due"]}
-                                                                required
-                                                            />
-                                                        </Box>
-                                                        <Button
-                                                            variant="contained"
-                                                            type="submit"
-                                                            color="primary"
-                                                            className="mt-4"
-                                                        >
-                                                            Provide
-                                                        </Button>
-                                                    </FormWrapper>
-                                                </Box>
-                                            </Modal>
-                                        </IconButton>
+                                                        Provide
+                                                    </Button>
+                                                </FormWrapper>
+                                            </Box>
+                                        </Modal>
                                     </TableCell>
                                 </TableRow>
                             ))
                         }
 
-                        {(!customers?.data?.length && !isLoading) && <NoDataFound />}
                     </TableBody>
                 </Table>
+                {(!customers?.data?.length && !isLoading) && <NoDataFound />}
             </TableContainer>
             <Box className="my-5">
                 <Link href="/">← Go back</Link>

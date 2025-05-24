@@ -7,14 +7,21 @@ import Link from "next/link";
 const Dashboard = () => {
   const { data: orders } = useGetOrdersQuery(undefined);
 
-  orders?.data?.forEach((order: any) => {
-    console.log(order);
-  });
-
   const totalOrders = orders?.data?.length || 0;
-  const totalPaid = orders?.data?.reduce((acc: number, order: any) => acc + order.paid, 0) || 0;
-  const totalDue = orders?.data?.reduce((acc: number, order: any) => acc + order.due, 0) || 0;
-  const totalBottles = orders?.data?.reduce((acc: number, order: any) => acc + order.bottles, 0) || 0;
+
+  const totalPaid = orders?.data?.reduce((acc: number, order: any) => {
+    if (order.paymentStatus === "Paid") {
+      return acc + order.totalPrice;
+    }
+  }, 0) || 0;
+
+  const totalUnpaid = orders?.data?.reduce((acc: number, order: any) => {
+    if (order.paymentStatus === "Due") {
+      return acc + order.totalPrice;
+    }
+  }, 0) || 0;
+
+  const totalBottles = orders?.data?.reduce((acc: number, order: any) => acc + order.quantity, 0) || 0;
 
   return (
     <div className="bg-gray-100">
@@ -33,7 +40,9 @@ const Dashboard = () => {
             <Link href="/manage-customers">
               <button className="w-full py-5 rounded-xl text-[19px] font-semibold text-white bg-red-500 cursor-pointer">Manage All Customers</button>
             </Link>
-            <Link href="/dashboard/manage-teachers"><button className="w-full py-5 rounded-xl text-[19px] font-semibold text-white bg-blue-500">See All Sells</button></Link>
+            <Link href="/sells-history">
+              <button className="w-full py-5 rounded-xl text-[19px] font-semibold text-white bg-blue-500 cursor-pointer">See All Sells</button>
+            </Link>
             <Link href="/dashboard/manage-students"><button className="w-full py-5 rounded-xl text-[19px] font-semibold text-white bg-yellow-500">Update Product</button></Link>
           </div>
         </div>
@@ -41,20 +50,20 @@ const Dashboard = () => {
         <div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white rounded-lg shadow p-6">
-              <div className="text-sm font-medium text-gray-500">Total Sells (Today)</div>
+              <div className="text-sm font-medium text-gray-500">Total Sells</div>
               <div className="mt-2 text-3xl font-semibold text-blue-600">{totalBottles} Bottles</div>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
-              <div className="text-sm font-medium text-gray-500">Served Customers (Today)</div>
+              <div className="text-sm font-medium text-gray-500">Served Customers</div>
               <div className="mt-2 text-3xl font-semibold text-green-600">{totalOrders} People</div>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
-              <div className="text-sm font-medium text-gray-500">Paid Amount (Today)</div>
+              <div className="text-sm font-medium text-gray-500">Paid Amount</div>
               <div className="mt-2 text-3xl font-semibold text-purple-600">৳{totalPaid}</div>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
-              <div className="text-sm font-medium text-gray-500">Due Amount (Today)</div>
-              <div className="mt-2 text-3xl font-semibold text-yellow-600">৳{totalDue}</div>
+              <div className="text-sm font-medium text-gray-500">Due Amount</div>
+              <div className="mt-2 text-3xl font-semibold text-red-600">৳{totalUnpaid}</div>
             </div>
           </div>
         </div>
@@ -65,28 +74,35 @@ const Dashboard = () => {
           </div>
           <div className="px-6 py-4">
             <div className="space-y-4">
-              {[1, 2, 3].map((item) => (
-                <div key={item} className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Abdur Rahim #{item}</p>
-                    <p className="text-sm text-gray-500">20L Water Can</p>
+              {
+                orders?.data?.slice(0, 10)?.map((order: any, idx: number) => (
+                  <div key={idx} className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{order.customer.name} #{order.customer.customerId}</p>
+                      <p className="text-sm text-gray-500">20L Water Can</p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      {
+                        order.paymentStatus === "Paid" ? (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            {order.paymentStatus}
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            {order.paymentStatus}
+                          </span>
+                        )
+                      }
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        ৳{order.totalPrice}
+                      </span>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        {order.quantity} Bottles
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      Paid
-                    </span>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                      Due
-                    </span>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      120 Taka
-                    </span>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      3 Bottles
-                    </span>
-                  </div>
-                </div>
-              ))}
+                ))
+              }
             </div>
           </div>
         </div>

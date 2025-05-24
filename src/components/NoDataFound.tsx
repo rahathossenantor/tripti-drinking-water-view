@@ -1,9 +1,7 @@
-import Image from "next/image";
-
 const NoDataFound = () => {
     return (
-        <div className="text-center">
-            <Image className="inline-block w-60" src="https://www.eduplusnow.com/assets/social-img/No-Data-Found-Image.png" alt="no-data-found" />
+        <div className="text-center my-5">
+            <h3 className="text-3xl">No Data Found!</h3>
         </div>
     );
 };
