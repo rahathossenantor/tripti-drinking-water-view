@@ -9,17 +9,15 @@ const Dashboard = () => {
 
   const totalOrders = orders?.data?.length || 0;
 
-  const totalPaid = orders?.data?.reduce((acc: number, order: any) => {
-    if (order.paymentStatus === "Paid") {
-      return acc + order.totalPrice;
-    }
-  }, 0) || 0;
+  let totalPaid = orders?.data?.filter((order: any) => {
+    return order.paymentStatus === "Paid";
+  }) || 0;
+  totalPaid = totalPaid?.reduce((acc: number, order: any) => acc + order.totalPrice, 0) || 0;
 
-  const totalUnpaid = orders?.data?.reduce((acc: number, order: any) => {
-    if (order.paymentStatus === "Due") {
-      return acc + order.totalPrice;
-    }
-  }, 0) || 0;
+  let totalUnpaid = orders?.data?.filter((order: any) => {
+    return order.paymentStatus === "Due";
+  }) || 0;
+  totalUnpaid = totalUnpaid?.reduce((acc: number, order: any) => acc + order.totalPrice, 0) || 0;
 
   const totalBottles = orders?.data?.reduce((acc: number, order: any) => acc + order.quantity, 0) || 0;
 
@@ -55,7 +53,7 @@ const Dashboard = () => {
             </div>
             <div className="bg-white rounded-lg shadow p-6">
               <div className="text-sm font-medium text-gray-500">Served Customers</div>
-              <div className="mt-2 text-3xl font-semibold text-green-600">{totalOrders} People</div>
+              <div className="mt-2 text-3xl font-semibold text-green-600">{totalOrders} Customers</div>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
               <div className="text-sm font-medium text-gray-500">Paid Amount</div>
@@ -102,6 +100,11 @@ const Dashboard = () => {
                     </div>
                   </div>
                 ))
+              }
+              {
+                orders?.data?.length === 0 && (
+                  <p className="text-gray-500 text-center">No recent supplies found.</p>
+                )
               }
             </div>
           </div>
