@@ -33,6 +33,10 @@ const AddCustomer = () => {
             delete values.email;
         };
 
+        if (!values.deliveryAddress) {
+            values.deliveryAddress = "N/A";
+        }
+
         try {
             const res = await createCustomer(values).unwrap();
             toast.success(res?.message, { id: toastId, duration: 2000 });

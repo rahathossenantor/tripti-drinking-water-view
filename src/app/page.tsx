@@ -1,23 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import Loader from "@/components/Loader";
 import { useGetOrdersQuery } from "@/redux/api/orderApi";
 import Link from "next/link";
 
 const Dashboard = () => {
-  const { data: orders } = useGetOrdersQuery(undefined);
+  const { data: orders, isFetching } = useGetOrdersQuery(undefined);
 
   const totalOrders = orders?.data?.length || 0;
 
-  let totalPaid = orders?.data?.filter((order: any) => {
-    return order.paymentStatus === "Paid";
-  }) || 0;
-  totalPaid = totalPaid?.reduce((acc: number, order: any) => acc + order.totalPrice, 0) || 0;
+  let totalPaid: any, totalUnpaid: any;
 
-  let totalUnpaid = orders?.data?.filter((order: any) => {
-    return order.paymentStatus === "Due";
-  }) || 0;
-  totalUnpaid = totalUnpaid?.reduce((acc: number, order: any) => acc + order.totalPrice, 0) || 0;
+  if (!isFetching) {
+    totalPaid = orders?.data?.filter((order: any) => {
+      return order.paymentStatus === "Paid";
+    })?.reduce((acc: number, order: any) => acc + order.totalPrice, 0) || 0;
+
+    totalUnpaid = orders?.data?.filter((order: any) => {
+      return order.paymentStatus === "Due";
+    })?.reduce((acc: number, order: any) => acc + order.totalPrice, 0) || 0;
+  };
 
   const totalBottles = orders?.data?.reduce((acc: number, order: any) => acc + order.quantity, 0) || 0;
 
@@ -46,24 +49,32 @@ const Dashboard = () => {
         </div>
 
         <div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="text-sm font-medium text-gray-500">Total Sells</div>
-              <div className="mt-2 text-3xl font-semibold text-blue-600">{totalBottles} Bottles</div>
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="text-sm font-medium text-gray-500">Served Customers</div>
-              <div className="mt-2 text-3xl font-semibold text-green-600">{totalOrders} Customers</div>
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="text-sm font-medium text-gray-500">Paid Amount</div>
-              <div className="mt-2 text-3xl font-semibold text-purple-600">৳{totalPaid}</div>
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="text-sm font-medium text-gray-500">Due Amount</div>
-              <div className="mt-2 text-3xl font-semibold text-red-600">৳{totalUnpaid}</div>
-            </div>
-          </div>
+          {
+            isFetching ? (
+              <div className="text-center py-8">
+                <Loader />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="bg-white p-6 rounded-lg shadow">
+                  <h3 className="text-lg font-medium text-gray-900">Total Orders</h3>
+                  <p className="text-2xl font-bold text-gray-800">{totalOrders}</p>
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow">
+                  <h3 className="text-lg font-medium text-gray-900">Total Paid</h3>
+                  <p className="text-2xl font-bold text-green-600">৳{totalPaid}</p>
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow">
+                  <h3 className="text-lg font-medium text-gray-900">Total Unpaid</h3>
+                  <p className="text-2xl font-bold text-red-600">৳{totalUnpaid}</p>
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow">
+                  <h3 className="text-lg font-medium text-gray-900">Total Bottles Sold</h3>
+                  <p className="text-2xl font-bold text-blue-600">{totalBottles} Bottles</p>
+                </div>
+              </div>
+            )
+          }
         </div>
 
         <div className="bg-white rounded-lg shadow mt-8">
