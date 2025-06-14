@@ -3,22 +3,37 @@
 
 import {
     Container, Typography, Box, Paper, Table, TableBody, TableCell,
-    TableContainer, TableHead, TableRow, Chip, TextField, MenuItem, Stack
+    TableContainer, TableHead, TableRow, Chip, TextField, MenuItem, Stack, IconButton
 } from "@mui/material";
-import { useGetOrdersQuery } from "@/redux/api/orderApi";
+import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
+import { useGetOrdersQuery, useUpdateOrderPaymentStatusMutation } from "@/redux/api/orderApi";
 import Loader from "@/components/Loader";
 import NoDataFound from "@/components/NoDataFound";
 import Link from "next/link";
+import { toast } from "sonner";
 import React from "react";
 
 const SellsHistory = () => {
     const { data: orders, isLoading } = useGetOrdersQuery(undefined);
+    const [updatePaymentStatus] = useUpdateOrderPaymentStatusMutation();
     const [filters, setFilters] = React.useState({
         customerType: "",
         serviceType: "",
         paymentStatus: "",
         search: ""
     });
+
+    const handlePaymentStatusUpdate = async (id: string) => {
+        const toastId = toast.loading("Updating payment status...");
+
+        try {
+            const res = await updatePaymentStatus({ id }).unwrap();
+            toast.success(res?.message, { id: toastId, duration: 2000 });
+        } catch (error: any) {
+            console.error("Error updating payment status:", error);
+            toast.error(error?.message || error?.data?.message, { id: toastId });
+        }
+    };
 
     const filteredOrders = React.useMemo(() => {
         if (!orders?.data) return [];
@@ -111,19 +126,18 @@ const SellsHistory = () => {
                     <TableHead className="bg-gray-100">
                         <TableRow>
                             <TableCell className="font-bold">Customer Name</TableCell>
-                            <TableCell className="font-bold">Phone</TableCell>
                             <TableCell className="font-bold">Quantity</TableCell>
                             <TableCell className="font-bold">Total Price</TableCell>
                             <TableCell className="font-bold">Payment Status</TableCell>
                             <TableCell className="font-bold">Service Type</TableCell>
                             <TableCell className="font-bold">Customer Type</TableCell>
+                            <TableCell className="font-bold">Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {filteredOrders.map((order: any) => (
                             <TableRow key={order._id} className="hover:bg-gray-50">
                                 <TableCell>{order.customer.name}</TableCell>
-                                <TableCell>{order.customer.phone}</TableCell>
                                 <TableCell>{order.quantity}</TableCell>
                                 <TableCell>৳{order.totalPrice}</TableCell>
                                 <TableCell>
@@ -149,6 +163,28 @@ const SellsHistory = () => {
                                         color={order.customer.customerType === "Business" ? "primary" : "default"}
                                         size="small"
                                     />
+                                </TableCell>
+                                <TableCell>
+                                    <IconButton
+                                        size="small"
+                                        color="primary"
+                                        className="mr-2"
+                                        disabled={order.paymentStatus === "Paid"}
+                                        onClick={() => {
+                                            handlePaymentStatusUpdate(order._id);
+                                        }}
+                                    >
+                                        <EditIcon />
+                                    </IconButton>
+                                    <IconButton
+                                        size="small"
+                                        color="error"
+                                        onClick={() => {
+                                            // Handle delete
+                                        }}
+                                    >
+                                        <DeleteIcon />
+                                    </IconButton>
                                 </TableCell>
                             </TableRow>
                         ))}

@@ -17,10 +17,19 @@ const orderApi = baseApi.injectEndpoints({
             }),
             providesTags: ["orders"],
         }),
+        updateOrderPaymentStatus: build.mutation({
+            query: ({ id }) => ({
+                url: `/orders/${id}`,
+                method: "PATCH",
+                data: { paymentStatus: "Paid" },
+            }),
+            invalidatesTags: ["orders"],
+        }),
     }),
 });
 
 export const {
     useCreateOrderMutation,
     useGetOrdersQuery,
+    useUpdateOrderPaymentStatusMutation,
 } = orderApi;
