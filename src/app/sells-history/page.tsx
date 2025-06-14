@@ -6,7 +6,7 @@ import {
     TableContainer, TableHead, TableRow, Chip, TextField, MenuItem, Stack, IconButton
 } from "@mui/material";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
-import { useGetOrdersQuery, useUpdateOrderPaymentStatusMutation } from "@/redux/api/orderApi";
+import { useGetOrdersQuery, useUpdateOrderPaymentStatusMutation, useDeleteOrderMutation } from "@/redux/api/orderApi";
 import Loader from "@/components/Loader";
 import NoDataFound from "@/components/NoDataFound";
 import Link from "next/link";
@@ -16,6 +16,8 @@ import React from "react";
 const SellsHistory = () => {
     const { data: orders, isLoading } = useGetOrdersQuery(undefined);
     const [updatePaymentStatus] = useUpdateOrderPaymentStatusMutation();
+    const [deleteOrder] = useDeleteOrderMutation();
+
     const [filters, setFilters] = React.useState({
         customerType: "",
         serviceType: "",
@@ -24,6 +26,8 @@ const SellsHistory = () => {
     });
 
     const handlePaymentStatusUpdate = async (id: string) => {
+        if (!window.confirm("Are you sure you want to update the payment status?")) return;
+
         const toastId = toast.loading("Updating payment status...");
 
         try {
@@ -31,6 +35,20 @@ const SellsHistory = () => {
             toast.success(res?.message, { id: toastId, duration: 2000 });
         } catch (error: any) {
             console.error("Error updating payment status:", error);
+            toast.error(error?.message || error?.data?.message, { id: toastId });
+        }
+    };
+
+    const handleDeleteOrder = async (id: string) => {
+
+        if (!window.confirm("Are you sure you want to delete this order?")) return;
+
+        const toastId = toast.loading("Deleting order...");
+        try {
+            const res = await deleteOrder({ id }).unwrap();
+            toast.success(res?.message, { id: toastId, duration: 2000 });
+        } catch (error: any) {
+            console.error("Error deleting order:", error);
             toast.error(error?.message || error?.data?.message, { id: toastId });
         }
     };
@@ -180,7 +198,7 @@ const SellsHistory = () => {
                                         size="small"
                                         color="error"
                                         onClick={() => {
-                                            // Handle delete
+                                            handleDeleteOrder(order._id);
                                         }}
                                     >
                                         <DeleteIcon />
