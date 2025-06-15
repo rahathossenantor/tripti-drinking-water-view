@@ -83,23 +83,23 @@ const AddCustomer = () => {
                                 <div className="grid grid-cols-1 gap-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <InputWrapper
-                                            label="Full Name"
+                                            label="পুরো নাম"
                                             name="name"
                                             required
                                         />
                                         <InputWrapper
-                                            label="Email"
+                                            label="ইমেইল (যদি থাকে)"
                                             type="email"
                                             name="email"
                                         />
                                         <InputWrapper
-                                            label="Phone Number"
+                                            label="মোবাইল নাম্বার"
                                             name="phone"
                                             type="number"
                                             required
                                         />
                                         <InputWrapper
-                                            label="Product Price"
+                                            label="প্রতি বোতলের মূল্য"
                                             type="number"
                                             name="productPrice"
                                             required
@@ -107,7 +107,7 @@ const AddCustomer = () => {
                                     </div>
                                     <div>
                                         <InputWrapper
-                                            label="Delivery Address"
+                                            label="ঠিকানা"
                                             name="deliveryAddress"
                                             multiline
                                             required
@@ -116,13 +116,13 @@ const AddCustomer = () => {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <InputSelectWrapper
                                             name="customerType"
-                                            label="Customer Type"
+                                            label="কাস্টমারের ধরণ"
                                             items={["Residential", "Business"]}
                                             required
                                         >
                                         </InputSelectWrapper>
                                         <InputSelectWrapper
-                                            label="Service Type"
+                                            label="ডেলিভারির ধরণ"
                                             name="serviceType"
                                             required
                                             items={["Daily", "Weekly", "Monthly"]}
