@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import * as React from "react";
-import { Container, Typography, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Chip, Button } from "@mui/material";
+import React from "react";
+import { Container, Typography, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Chip, Button, Stack, TextField, MenuItem } from "@mui/material";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
+import WaterDropIcon from "@mui/icons-material/WaterDrop";
 import Modal from "@mui/material/Modal";
 import Link from "next/link";
 import { useGetCustomersQuery } from "@/redux/api/customersAPI";
@@ -35,6 +36,12 @@ const ManageCustomers = () => {
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
+    const [filters, setFilters] = React.useState({
+        search: "",
+        serviceType: "",
+        customerType: ""
+    });
+
     const { data: customers, isLoading } = useGetCustomersQuery(undefined);
     const [createOrder] = useCreateOrderMutation();
 
@@ -55,6 +62,22 @@ const ManageCustomers = () => {
         }
     };
 
+    const filteredCustomers = React.useMemo(() => {
+        if (!customers?.data) return [];
+
+        return customers.data.filter((customer: any) => {
+            const matchesSearch = !filters.search ||
+                customer.name.toLowerCase().includes(filters.search.toLowerCase()) ||
+                customer.phone.includes(filters.search);
+            const matchesServiceType = !filters.serviceType ||
+                customer.serviceType === filters.serviceType;
+            const matchesCustomerType = !filters.customerType ||
+                customer.customerType === filters.customerType;
+
+            return matchesSearch && matchesServiceType && matchesCustomerType;
+        });
+    }, [customers?.data, filters]);
+
     if (isLoading) {
         return (
             <Container className="h-screen flex items-center justify-center">
@@ -66,16 +89,69 @@ const ManageCustomers = () => {
     return (
         <Container className="py-8">
             <Box className="flex justify-between items-center mb-6">
-                <Typography variant="h5" className="font-bold">
+                <Link
+                    href="/"
+                    className="text-blue-600 hover:text-blue-800 font-semibold"
+                >
+                    ← Go back
+                </Link>
+                <Typography variant="h5" className="font-bold hidden md:block">
                     Manage Customers
                 </Typography>
                 <Link
-                    href="/add-customer"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
+                    href="/manage-sales"
+                    className="text-blue-600 hover:text-blue-800 font-semibold"
                 >
-                    Add New Customer
+                    See All Sales
                 </Link>
             </Box>
+
+            <Paper className="p-4 mb-4">
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+                    <TextField
+                        label="Search"
+                        size="small"
+                        value={filters.search}
+                        onChange={(e) => setFilters(prev => ({
+                            ...prev,
+                            search: e.target.value
+                        }))}
+                        placeholder="Search by name or phone"
+                        className="min-w-[200px]"
+                    />
+                    <TextField
+                        select
+                        label="Service Type"
+                        size="small"
+                        value={filters.serviceType}
+                        onChange={(e) => setFilters(prev => ({
+                            ...prev,
+                            serviceType: e.target.value
+                        }))}
+                        className="min-w-[150px]"
+                    >
+                        <MenuItem value="">All</MenuItem>
+                        <MenuItem value="Daily">Daily</MenuItem>
+                        <MenuItem value="Weekly">Weekly</MenuItem>
+                        <MenuItem value="Monthly">Monthly</MenuItem>
+                    </TextField>
+                    <TextField
+                        select
+                        label="Customer Type"
+                        size="small"
+                        value={filters.customerType}
+                        onChange={(e) => setFilters(prev => ({
+                            ...prev,
+                            customerType: e.target.value
+                        }))}
+                        className="min-w-[150px]"
+                    >
+                        <MenuItem value="">All</MenuItem>
+                        <MenuItem value="Residential">Residential</MenuItem>
+                        <MenuItem value="Business">Business</MenuItem>
+                    </TextField>
+                </Stack>
+            </Paper>
 
             <TableContainer component={Paper} className="shadow-md">
                 <Table>
@@ -83,26 +159,27 @@ const ManageCustomers = () => {
                         <TableRow>
                             <TableCell className="font-bold">Name</TableCell>
                             <TableCell className="font-bold">Phone</TableCell>
-                            {/* <TableCell className="font-bold">Customer Type</TableCell> */}
+                            <TableCell className="font-bold">Customer Type</TableCell>
                             <TableCell className="font-bold">Service Type</TableCell>
                             <TableCell className="font-bold">Price</TableCell>
                             <TableCell className="font-bold">Actions</TableCell>
                             <TableCell className="font-bold">Sell</TableCell>
                         </TableRow>
                     </TableHead>
+
                     <TableBody>
                         {
-                            customers?.data?.map((customer: any) => (
+                            filteredCustomers.map((customer: any) => (
                                 <TableRow key={customer.customerId} className="hover:bg-gray-50">
                                     <TableCell>{customer.name}</TableCell>
                                     <TableCell>{customer.phone}</TableCell>
-                                    {/* <TableCell>
+                                    <TableCell>
                                         <Chip
                                             label={customer.customerType}
                                             color={customer.customerType === "Business" ? "primary" : "default"}
                                             size="small"
                                         />
-                                    </TableCell> */}
+                                    </TableCell>
                                     <TableCell>
                                         <Chip
                                             label={customer.serviceType}
@@ -136,7 +213,9 @@ const ManageCustomers = () => {
                                         </IconButton>
                                     </TableCell>
                                     <TableCell>
-                                        <Button onClick={handleOpen}>Give Water</Button>
+                                        <Button onClick={handleOpen}>
+                                            <WaterDropIcon />
+                                        </Button>
                                         <Modal
                                             open={open}
                                             onClose={handleClose}
@@ -185,14 +264,10 @@ const ManageCustomers = () => {
                                 </TableRow>
                             ))
                         }
-
                     </TableBody>
                 </Table>
                 {(!customers?.data?.length && !isLoading) && <NoDataFound />}
             </TableContainer>
-            <Box className="my-5">
-                <Link href="/">← Go back</Link>
-            </Box>
         </Container>
     );
 };

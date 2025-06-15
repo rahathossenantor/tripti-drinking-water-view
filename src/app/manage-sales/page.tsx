@@ -13,7 +13,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import React from "react";
 
-const SellsHistory = () => {
+const ManageSales = () => {
     const { data: orders, isLoading } = useGetOrdersQuery(undefined);
     const [updatePaymentStatus] = useUpdateOrderPaymentStatusMutation();
     const [deleteOrder] = useDeleteOrderMutation();
@@ -83,14 +83,26 @@ const SellsHistory = () => {
     return (
         <Container className="py-8">
             <Box className="flex justify-between items-center mb-6">
-                <Typography variant="h5" className="font-bold">
-                    Sales History
+                <Link
+                    href="/"
+                    className="text-blue-600 hover:text-blue-800 font-semibold"
+                >
+                    ← Go back
+                </Link>
+                <Typography variant="h5" className="font-bold hidden md:block">
+                    Manage Sales
                 </Typography>
+                <Link
+                    href="/manage-customers"
+                    className="text-blue-600 hover:text-blue-800 font-semibold"
+                >
+                    See All Customers
+                </Link>
             </Box>
 
             {/* Add Filter Section */}
             <Paper className="p-4 mb-4">
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
                     <TextField
                         label="Search"
                         size="small"
@@ -217,4 +229,4 @@ const SellsHistory = () => {
     );
 };
 
-export default SellsHistory;
+export default ManageSales;

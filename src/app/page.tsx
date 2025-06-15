@@ -41,7 +41,7 @@ const Dashboard = () => {
             <Link href="/manage-customers">
               <button className="w-full py-5 rounded-xl text-[19px] font-semibold text-white bg-red-500 cursor-pointer">Manage All Customers</button>
             </Link>
-            <Link href="/sells-history">
+            <Link href="/manage-sales">
               <button className="w-full py-5 rounded-xl text-[19px] font-semibold text-white bg-blue-500 cursor-pointer">See All Sells</button>
             </Link>
             <Link href="/dashboard/manage-students"><button className="w-full py-5 rounded-xl text-[19px] font-semibold text-white bg-yellow-500">Update Product</button></Link>
