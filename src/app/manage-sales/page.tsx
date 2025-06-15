@@ -11,6 +11,7 @@ import Loader from "@/components/Loader";
 import NoDataFound from "@/components/NoDataFound";
 import Link from "next/link";
 import { toast } from "sonner";
+import Swal from "sweetalert2";
 import React from "react";
 
 const ManageSales = () => {
@@ -26,31 +27,50 @@ const ManageSales = () => {
     });
 
     const handlePaymentStatusUpdate = async (id: string) => {
-        if (!window.confirm("Are you sure you want to update the payment status?")) return;
+        Swal.fire({
+            title: "Are you sure you want to update the payment status?",
+            text: "This action cannot be undone.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, update it!"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const toastId = toast.loading("Updating payment status...");
 
-        const toastId = toast.loading("Updating payment status...");
-
-        try {
-            const res = await updatePaymentStatus({ id }).unwrap();
-            toast.success(res?.message, { id: toastId, duration: 2000 });
-        } catch (error: any) {
-            console.error("Error updating payment status:", error);
-            toast.error(error?.message || error?.data?.message, { id: toastId });
-        }
+                try {
+                    const res = await updatePaymentStatus({ id }).unwrap();
+                    toast.success(res?.message, { id: toastId, duration: 2000 });
+                } catch (error: any) {
+                    console.error("Error updating payment status:", error);
+                    toast.error(error?.message || error?.data?.message, { id: toastId });
+                }
+            }
+        });
     };
 
     const handleDeleteOrder = async (id: string) => {
-
-        if (!window.confirm("Are you sure you want to delete this order?")) return;
-
-        const toastId = toast.loading("Deleting order...");
-        try {
-            const res = await deleteOrder({ id }).unwrap();
-            toast.success(res?.message, { id: toastId, duration: 2000 });
-        } catch (error: any) {
-            console.error("Error deleting order:", error);
-            toast.error(error?.message || error?.data?.message, { id: toastId });
-        }
+        Swal.fire({
+            title: "Are you sure you want to delete this order?",
+            text: "This action cannot be undone.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const toastId = toast.loading("Deleting order...");
+                try {
+                    const res = await deleteOrder({ id }).unwrap();
+                    toast.success(res?.message, { id: toastId, duration: 2000 });
+                } catch (error: any) {
+                    console.error("Error deleting order:", error);
+                    toast.error(error?.message || error?.data?.message, { id: toastId });
+                }
+            }
+        });
     };
 
     const filteredOrders = React.useMemo(() => {

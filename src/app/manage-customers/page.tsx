@@ -7,7 +7,7 @@ import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import WaterDropIcon from "@mui/icons-material/WaterDrop";
 import Modal from "@mui/material/Modal";
 import Link from "next/link";
-import { useGetCustomersQuery } from "@/redux/api/customersAPI";
+import { useDeleteCustomerMutation, useGetCustomersQuery } from "@/redux/api/customersAPI";
 import FormWrapper from "@/components/FormWrapper";
 import InputWrapper from "@/components/InputWrapper";
 import InputSelectWrapper from "@/components/InputSelectWrapper";
@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { useCreateOrderMutation } from "@/redux/api/orderApi";
 import Loader from "@/components/Loader";
 import NoDataFound from "@/components/NoDataFound";
+import Swal from "sweetalert2";
 
 const style = {
     position: "absolute",
@@ -41,6 +42,32 @@ const ManageCustomers = () => {
         serviceType: "",
         customerType: ""
     });
+
+    const [deleteCustomer] = useDeleteCustomerMutation();
+
+    const handleDelete = async (id: string) => {
+        Swal.fire({
+            title: "Are you sure you want to delete this customer?",
+            text: "This action cannot be undone.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const toastId = toast.loading("Deleting customer...");
+
+                try {
+                    const res = await deleteCustomer(id).unwrap();
+                    toast.success(res?.message, { id: toastId, duration: 2000 });
+                } catch (error: any) {
+                    console.error("Error deleting customer:", error);
+                    toast.error(error?.message || error?.data?.message, { id: toastId });
+                };
+            }
+        });
+    };
 
     const { data: customers, isLoading } = useGetCustomersQuery(undefined);
     const [createOrder] = useCreateOrderMutation();
@@ -206,7 +233,7 @@ const ManageCustomers = () => {
                                             size="small"
                                             color="error"
                                             onClick={() => {
-                                                // Handle delete
+                                                handleDelete(customer._id);
                                             }}
                                         >
                                             <DeleteIcon />

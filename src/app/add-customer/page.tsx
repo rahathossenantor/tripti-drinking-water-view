@@ -49,7 +49,12 @@ const AddCustomer = () => {
     return (
         <Container>
             <Box className="my-5">
-                <Link href="/">← Go back</Link>
+                <Link
+                    href="/"
+                    className="text-blue-600 hover:text-blue-800 font-semibold"
+                >
+                    ← Go back
+                </Link>
             </Box>
             <Container className="py-8 border-2 border-gray-300 rounded-lg">
                 <Stack className="items-center justify-center">
