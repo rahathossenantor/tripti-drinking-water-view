@@ -58,7 +58,7 @@ const Dashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="bg-white p-6 rounded-lg shadow">
                   <h3 className="text-lg font-medium text-gray-900">সর্বমোট অর্ডার</h3>
-                  <p className="text-2xl font-bold text-gray-800">{totalOrders}</p>
+                  <p className="text-2xl font-bold text-gray-800">{totalOrders} টি</p>
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow">
                   <h3 className="text-lg font-medium text-gray-900">সর্বমোট পরিশোধিত</h3>
@@ -88,7 +88,7 @@ const Dashboard = () => {
                   <div key={idx} className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-900">{order.customer.name} #{order.customer.customerId}</p>
-                      <p className="text-sm text-gray-500">20L পানির বোতল</p>
+                      <p className="text-sm text-gray-500">20L বোতল</p>
                     </div>
                     <div className="flex items-center space-x-2">
                       {

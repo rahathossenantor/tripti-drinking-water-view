@@ -53,7 +53,7 @@ const AddCustomer = () => {
                     href="/"
                     className="text-blue-600 hover:text-blue-800 font-semibold"
                 >
-                    ← Go back
+                    ← পেছনে যান
                 </Link>
             </Box>
             <Container className="py-8 border-2 border-gray-300 rounded-lg">
@@ -135,7 +135,7 @@ const AddCustomer = () => {
                                         fullWidth
                                         className="bg-blue-600 hover:bg-blue-700 py-3 text-lg"
                                     >
-                                        Add Customer
+                                        যোগ করুন
                                     </Button>
                                 </div>
                             </FormWrapper>

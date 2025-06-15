@@ -129,7 +129,7 @@ const ManageCustomers = () => {
                     href="/manage-sales"
                     className="text-blue-600 hover:text-blue-800 font-semibold"
                 >
-                   বিক্রির তালিকা দেখুন
+                    বিক্রির তালিকা দেখুন
                 </Link>
             </Box>
 
@@ -148,7 +148,7 @@ const ManageCustomers = () => {
                     />
                     <TextField
                         select
-                        label="ডেলিভারির ধরন"
+                        label="ডেলিভারির ধরণ"
                         size="small"
                         value={filters.serviceType}
                         onChange={(e) => setFilters(prev => ({
@@ -164,7 +164,7 @@ const ManageCustomers = () => {
                     </TextField>
                     <TextField
                         select
-                        label="কাস্টমারের ধরন"
+                        label="কাস্টমারের ধরণ"
                         size="small"
                         value={filters.customerType}
                         onChange={(e) => setFilters(prev => ({
@@ -186,8 +186,8 @@ const ManageCustomers = () => {
                         <TableRow>
                             <TableCell className="font-bold">নাম</TableCell>
                             <TableCell className="font-bold">মোবাইল নাম্বার</TableCell>
-                            <TableCell className="font-bold">কাস্টমারের ধরন</TableCell>
-                            <TableCell className="font-bold">ডেলিভারির ধরন</TableCell>
+                            <TableCell className="font-bold">কাস্টমারের ধরণ</TableCell>
+                            <TableCell className="font-bold">ডেলিভারির ধরণ</TableCell>
                             <TableCell className="font-bold">মূল্য</TableCell>
                             <TableCell className="font-bold">একশন</TableCell>
                             <TableCell className="font-bold">বিক্রি</TableCell>

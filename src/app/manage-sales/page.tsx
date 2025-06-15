@@ -133,7 +133,7 @@ const ManageSales = () => {
                     />
                     <TextField
                         select
-                        label="ক্রেতার ধরন"
+                        label="ক্রেতার ধরণ"
                         size="small"
                         value={filters.customerType}
                         onChange={(e) => handleFilterChange('customerType', e.target.value)}
@@ -145,7 +145,7 @@ const ManageSales = () => {
                     </TextField>
                     <TextField
                         select
-                        label="ডেলিভারির ধরন"
+                        label="ডেলিভারির ধরণ"
                         size="small"
                         value={filters.serviceType}
                         onChange={(e) => handleFilterChange("serviceType", e.target.value)}
@@ -179,9 +179,9 @@ const ManageSales = () => {
                             <TableCell className="font-bold">পরিমাণ</TableCell>
                             <TableCell className="font-bold">মোট মূল্য</TableCell>
                             <TableCell className="font-bold">পেমেন্ট স্ট্যাটাস</TableCell>
-                            <TableCell className="font-bold">ডেলিভারির ধরন</TableCell>
-                            <TableCell className="font-bold">ক্রেতার ধরন</TableCell>
-                            <TableCell className="font-bold">একশনস</TableCell>
+                            <TableCell className="font-bold">ডেলিভারির ধরণ</TableCell>
+                            <TableCell className="font-bold">ক্রেতার ধরণ</TableCell>
+                            <TableCell className="font-bold">একশন</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -242,9 +242,6 @@ const ManageSales = () => {
                 </Table>
                 {(!filteredOrders.length && !isLoading) && <NoDataFound />}
             </TableContainer>
-            <Box className="my-5">
-                <Link href="/" className="text-blue-600 hover:text-blue-800">← Go back</Link>
-            </Box>
         </Container>
     );
 };
