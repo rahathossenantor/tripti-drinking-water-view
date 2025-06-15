@@ -47,8 +47,8 @@ const ManageCustomers = () => {
 
     const handleDelete = async (id: string) => {
         Swal.fire({
-            title: "Are you sure you want to delete this customer?",
-            text: "This action cannot be undone.",
+            title: "আপনি কি নিশ্চিতভাবে এই কাস্টমারকে ডিলিট করতে চান?",
+            text: "ডিলিট হওয়ার পরে এটি আর পাওয়া যাবে না!",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
@@ -56,7 +56,7 @@ const ManageCustomers = () => {
             confirmButtonText: "Yes, delete it!"
         }).then(async (result) => {
             if (result.isConfirmed) {
-                const toastId = toast.loading("Deleting customer...");
+                const toastId = toast.loading("ডিলিট করা হচ্ছে...");
 
                 try {
                     const res = await deleteCustomer(id).unwrap();
@@ -77,7 +77,7 @@ const ManageCustomers = () => {
         values.totalPrice = values.quantity * values.price;
         delete values.price;
 
-        const toastId = toast.loading("Providing water...");
+        const toastId = toast.loading("পানি দেয়া হচ্ছে...");
 
         try {
             const res = await createOrder(values).unwrap();
@@ -120,16 +120,16 @@ const ManageCustomers = () => {
                     href="/"
                     className="text-blue-600 hover:text-blue-800 font-semibold"
                 >
-                    ← Go back
+                    ← পেছনে যান
                 </Link>
                 <Typography variant="h5" className="font-bold hidden md:block">
-                    Manage Customers
+                    কাস্টমার ম্যানেজমেন্ট
                 </Typography>
                 <Link
                     href="/manage-sales"
                     className="text-blue-600 hover:text-blue-800 font-semibold"
                 >
-                    See All Sales
+                   বিক্রির তালিকা দেখুন
                 </Link>
             </Box>
 
@@ -143,12 +143,12 @@ const ManageCustomers = () => {
                             ...prev,
                             search: e.target.value
                         }))}
-                        placeholder="Search by name or phone"
+                        placeholder="নাম বা নাম্বার দিয়ে খুঁজুন"
                         className="min-w-[200px]"
                     />
                     <TextField
                         select
-                        label="Service Type"
+                        label="ডেলিভারির ধরন"
                         size="small"
                         value={filters.serviceType}
                         onChange={(e) => setFilters(prev => ({
@@ -164,7 +164,7 @@ const ManageCustomers = () => {
                     </TextField>
                     <TextField
                         select
-                        label="Customer Type"
+                        label="কাস্টমারের ধরন"
                         size="small"
                         value={filters.customerType}
                         onChange={(e) => setFilters(prev => ({
@@ -184,13 +184,13 @@ const ManageCustomers = () => {
                 <Table>
                     <TableHead className="bg-gray-100">
                         <TableRow>
-                            <TableCell className="font-bold">Name</TableCell>
-                            <TableCell className="font-bold">Phone</TableCell>
-                            <TableCell className="font-bold">Customer Type</TableCell>
-                            <TableCell className="font-bold">Service Type</TableCell>
-                            <TableCell className="font-bold">Price</TableCell>
-                            <TableCell className="font-bold">Actions</TableCell>
-                            <TableCell className="font-bold">Sell</TableCell>
+                            <TableCell className="font-bold">নাম</TableCell>
+                            <TableCell className="font-bold">মোবাইল নাম্বার</TableCell>
+                            <TableCell className="font-bold">কাস্টমারের ধরন</TableCell>
+                            <TableCell className="font-bold">ডেলিভারির ধরন</TableCell>
+                            <TableCell className="font-bold">মূল্য</TableCell>
+                            <TableCell className="font-bold">একশন</TableCell>
+                            <TableCell className="font-bold">বিক্রি</TableCell>
                         </TableRow>
                     </TableHead>
 
@@ -265,13 +265,13 @@ const ManageCustomers = () => {
                                                     <Box className="flex flex-col gap-4 my-4">
                                                         <InputWrapper
                                                             name="quantity"
-                                                            label="Quantity"
+                                                            label="পরিমাণ"
                                                             type="number"
                                                             required
                                                         />
                                                         <InputSelectWrapper
                                                             name="paymentStatus"
-                                                            label="Payment Status"
+                                                            label="পেমেন্ট স্ট্যাটাস"
                                                             items={["Paid", "Due"]}
                                                             required
                                                         />
@@ -282,7 +282,7 @@ const ManageCustomers = () => {
                                                         color="primary"
                                                         className="mt-4"
                                                     >
-                                                        Provide
+                                                        পানি দিন
                                                     </Button>
                                                 </FormWrapper>
                                             </Box>
