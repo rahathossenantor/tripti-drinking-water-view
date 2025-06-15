@@ -60,7 +60,7 @@ const AddCustomer = () => {
                 <Stack className="items-center justify-center">
                     <Box className="w-full border rounded-lg p-5">
                         <Typography variant="h5" className="font-bold text-center">
-                            Add New Customer
+                            নতুন কাস্টমার ফর্ম
                         </Typography>
 
                         <Box
