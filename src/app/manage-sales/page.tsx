@@ -28,16 +28,16 @@ const ManageSales = () => {
 
     const handlePaymentStatusUpdate = async (id: string) => {
         Swal.fire({
-            title: "Are you sure you want to update the payment status?",
-            text: "This action cannot be undone.",
+            title: "আপনি কি নিশ্চিতভাবে এই অর্ডারটিকে পরিশোধিত হিসেবে চিহ্নিত করতে চান?",
+            text: "পরবর্তীতে এটি আর পরিবর্তন করতে পারবেন না!",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, update it!"
+            confirmButtonText: "হ্যাঁ, করুন।"
         }).then(async (result) => {
             if (result.isConfirmed) {
-                const toastId = toast.loading("Updating payment status...");
+                const toastId = toast.loading("পরিশোধিত হিসেবে চিহ্নিত করা হচ্ছে...");
 
                 try {
                     const res = await updatePaymentStatus({ id }).unwrap();
@@ -52,16 +52,16 @@ const ManageSales = () => {
 
     const handleDeleteOrder = async (id: string) => {
         Swal.fire({
-            title: "Are you sure you want to delete this order?",
-            text: "This action cannot be undone.",
+            title: "আপনি কি নিশ্চিতভাবে এটি ডিলিট করতে চান?",
+            text: "এটি পুনরায় আর ফিরিয়ে আনা সম্ভব নয়!",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, delete it!"
+            confirmButtonText: "হ্যাঁ, করুন।"
         }).then(async (result) => {
             if (result.isConfirmed) {
-                const toastId = toast.loading("Deleting order...");
+                const toastId = toast.loading("ডিলিট করা হচ্ছে...");
                 try {
                     const res = await deleteOrder({ id }).unwrap();
                     toast.success(res?.message, { id: toastId, duration: 2000 });
@@ -107,16 +107,16 @@ const ManageSales = () => {
                     href="/"
                     className="text-blue-600 hover:text-blue-800 font-semibold"
                 >
-                    ← Go back
+                    ← পেছনে যান
                 </Link>
                 <Typography variant="h5" className="font-bold hidden md:block">
-                    Manage Sales
+                    বিক্রি ম্যানেজ করুন
                 </Typography>
                 <Link
                     href="/manage-customers"
                     className="text-blue-600 hover:text-blue-800 font-semibold"
                 >
-                    See All Customers
+                    সব কাস্টমার দেখুন
                 </Link>
             </Box>
 
@@ -127,13 +127,13 @@ const ManageSales = () => {
                         label="Search"
                         size="small"
                         value={filters.search}
-                        onChange={(e) => handleFilterChange('search', e.target.value)}
-                        placeholder="Search by name or phone"
+                        onChange={(e) => handleFilterChange("search", e.target.value)}
+                        placeholder="নাম বা নাম্বার দিয়ে খুঁজুন"
                         className="min-w-[200px]"
                     />
                     <TextField
                         select
-                        label="Customer Type"
+                        label="ক্রেতার ধরন"
                         size="small"
                         value={filters.customerType}
                         onChange={(e) => handleFilterChange('customerType', e.target.value)}
@@ -145,10 +145,10 @@ const ManageSales = () => {
                     </TextField>
                     <TextField
                         select
-                        label="Service Type"
+                        label="ডেলিভারির ধরন"
                         size="small"
                         value={filters.serviceType}
-                        onChange={(e) => handleFilterChange('serviceType', e.target.value)}
+                        onChange={(e) => handleFilterChange("serviceType", e.target.value)}
                         className="min-w-[150px]"
                     >
                         <MenuItem value="">All</MenuItem>
@@ -158,10 +158,10 @@ const ManageSales = () => {
                     </TextField>
                     <TextField
                         select
-                        label="Payment Status"
+                        label="পেমেন্ট স্ট্যাটাস"
                         size="small"
                         value={filters.paymentStatus}
-                        onChange={(e) => handleFilterChange('paymentStatus', e.target.value)}
+                        onChange={(e) => handleFilterChange("paymentStatus", e.target.value)}
                         className="min-w-[150px]"
                     >
                         <MenuItem value="">All</MenuItem>
@@ -175,13 +175,13 @@ const ManageSales = () => {
                 <Table>
                     <TableHead className="bg-gray-100">
                         <TableRow>
-                            <TableCell className="font-bold">Customer Name</TableCell>
-                            <TableCell className="font-bold">Quantity</TableCell>
-                            <TableCell className="font-bold">Total Price</TableCell>
-                            <TableCell className="font-bold">Payment Status</TableCell>
-                            <TableCell className="font-bold">Service Type</TableCell>
-                            <TableCell className="font-bold">Customer Type</TableCell>
-                            <TableCell className="font-bold">Actions</TableCell>
+                            <TableCell className="font-bold">নাম</TableCell>
+                            <TableCell className="font-bold">পরিমাণ</TableCell>
+                            <TableCell className="font-bold">মোট মূল্য</TableCell>
+                            <TableCell className="font-bold">পেমেন্ট স্ট্যাটাস</TableCell>
+                            <TableCell className="font-bold">ডেলিভারির ধরন</TableCell>
+                            <TableCell className="font-bold">ক্রেতার ধরন</TableCell>
+                            <TableCell className="font-bold">একশনস</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
