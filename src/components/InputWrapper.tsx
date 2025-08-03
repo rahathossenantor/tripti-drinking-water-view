@@ -29,6 +29,8 @@ const InputWrapper = ({
             render={({ field, fieldState: { error } }) => (
                 <TextField
                     {...field}
+                    id={`input-${name}`} // Add unique id for accessibility
+                    value={field.value || ""} // Ensure value is never undefined
                     label={label}
                     placeholder={label}
                     variant="outlined"

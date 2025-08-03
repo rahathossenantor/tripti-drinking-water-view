@@ -32,6 +32,8 @@ const InputSelectWrapper = ({
             render={({ field }) => (
                 <TextField
                     {...field}
+                    id={`select-${name}`} // Add unique id for accessibility
+                    value={field.value || ""} // Ensure value is never undefined
                     sx={sx}
                     size={size}
                     select

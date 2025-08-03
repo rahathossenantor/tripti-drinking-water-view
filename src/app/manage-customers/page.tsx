@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Container, Typography, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Chip, Button, Stack, TextField, MenuItem } from "@mui/material";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import WaterDropIcon from "@mui/icons-material/WaterDrop";
@@ -33,11 +33,11 @@ const style = {
 };
 
 const ManageCustomers = () => {
-    const [open, setOpen] = React.useState(false);
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+    const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+    const handleOpen = (customer: any) => setSelectedCustomer(customer);
+    const handleClose = () => setSelectedCustomer(null);
 
-    const [filters, setFilters] = React.useState({
+    const [filters, setFilters] = useState({
         search: "",
         serviceType: "",
         customerType: ""
@@ -53,7 +53,8 @@ const ManageCustomers = () => {
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, delete it!"
+            cancelButtonText: "না, বাতিল করুন।",
+            confirmButtonText: "হ্যাঁ, ডিলিট করুন।"
         }).then(async (result) => {
             if (result.isConfirmed) {
                 const toastId = toast.loading("ডিলিট করা হচ্ছে...");
@@ -240,53 +241,9 @@ const ManageCustomers = () => {
                                         </IconButton>
                                     </TableCell>
                                     <TableCell>
-                                        <Button onClick={handleOpen}>
+                                        <Button onClick={() => handleOpen(customer)}>
                                             <WaterDropIcon />
                                         </Button>
-                                        <Modal
-                                            open={open}
-                                            onClose={handleClose}
-                                            aria-labelledby="modal-modal-title"
-                                            aria-describedby="modal-modal-description"
-                                        >
-                                            <Box sx={style}>
-                                                <FormWrapper
-                                                    onSubmit={onSubmit}
-                                                    defaultValues={{
-                                                        quantity: 1,
-                                                        paymentStatus: "Due",
-                                                        customer: customer._id,
-                                                        price: customer.productPrice,
-                                                    }}
-                                                >
-                                                    <Typography variant="h6" component="h2">
-                                                        Provide Water
-                                                    </Typography>
-                                                    <Box className="flex flex-col gap-4 my-4">
-                                                        <InputWrapper
-                                                            name="quantity"
-                                                            label="পরিমাণ"
-                                                            type="number"
-                                                            required
-                                                        />
-                                                        <InputSelectWrapper
-                                                            name="paymentStatus"
-                                                            label="পেমেন্ট স্ট্যাটাস"
-                                                            items={["Paid", "Due"]}
-                                                            required
-                                                        />
-                                                    </Box>
-                                                    <Button
-                                                        variant="contained"
-                                                        type="submit"
-                                                        color="primary"
-                                                        className="mt-4"
-                                                    >
-                                                        পানি দিন
-                                                    </Button>
-                                                </FormWrapper>
-                                            </Box>
-                                        </Modal>
                                     </TableCell>
                                 </TableRow>
                             ))
@@ -295,6 +252,54 @@ const ManageCustomers = () => {
                 </Table>
                 {(!customers?.data?.length && !isLoading) && <NoDataFound />}
             </TableContainer>
+
+            {/* Move modal outside the table */}
+            <Modal
+                open={!!selectedCustomer}
+                onClose={handleClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style}>
+                    {selectedCustomer && (
+                        <FormWrapper
+                            onSubmit={onSubmit}
+                            defaultValues={{
+                                quantity: 1,
+                                paymentStatus: "Due",
+                                customer: selectedCustomer._id,
+                                price: selectedCustomer.productPrice,
+                            }}
+                        >
+                            <Typography variant="h6" component="h2">
+                                Provide Water to {selectedCustomer.name}
+                            </Typography>
+                            <Box className="flex flex-col gap-4 my-4">
+                                <InputWrapper
+                                    name="quantity"
+                                    label="পরিমাণ"
+                                    type="number"
+                                    required
+                                />
+                                <InputSelectWrapper
+                                    name="paymentStatus"
+                                    label="পেমেন্ট স্ট্যাটাস"
+                                    items={["Paid", "Due"]}
+                                    required
+                                />
+                            </Box>
+                            <Button
+                                variant="contained"
+                                type="submit"
+                                color="primary"
+                                className="mt-4"
+                            >
+                                পানি দিন
+                            </Button>
+                        </FormWrapper>
+                    )}
+                </Box>
+            </Modal>
         </Container>
     );
 };

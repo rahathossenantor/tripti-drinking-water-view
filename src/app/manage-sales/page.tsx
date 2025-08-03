@@ -34,6 +34,7 @@ const ManageSales = () => {
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
+            cancelButtonText: "না, বাতিল করুন।",
             confirmButtonText: "হ্যাঁ, করুন।"
         }).then(async (result) => {
             if (result.isConfirmed) {
@@ -58,7 +59,8 @@ const ManageSales = () => {
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
-            confirmButtonText: "হ্যাঁ, করুন।"
+            cancelButtonText: "না, বাতিল করুন।",
+            confirmButtonText: "হ্যাঁ, ডিলিট করুন।"
         }).then(async (result) => {
             if (result.isConfirmed) {
                 const toastId = toast.loading("ডিলিট করা হচ্ছে...");

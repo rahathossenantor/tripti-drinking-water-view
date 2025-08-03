@@ -12,13 +12,13 @@ type TFormConfig = {
 };
 
 const FormWrapper = ({ children, onSubmit, resolver, defaultValues }: TFormProps & TFormConfig) => {
-    const formConfig: TFormConfig = {};
-    if (resolver) {
-        formConfig["resolver"] = resolver;
+    const formConfig: TFormConfig = {
+        // Always provide an empty object as default values to prevent undefined values
+        defaultValues: defaultValues || {}
     };
 
-    if (defaultValues) {
-        formConfig["defaultValues"] = defaultValues;
+    if (resolver) {
+        formConfig["resolver"] = resolver;
     };
 
     const methods = useForm(formConfig);
