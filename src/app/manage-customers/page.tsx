@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Container, Typography, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Chip, Button, Stack, TextField, MenuItem, Card, CardContent } from "@mui/material";
+import { Container, Typography, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Chip, Button, Stack, TextField, MenuItem, Card, CardContent, Pagination } from "@mui/material";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import Modal from "@mui/material/Modal";
 import { motion, AnimatePresence } from "framer-motion";
@@ -44,6 +44,11 @@ const ManageCustomers = () => {
         search: "",
         serviceType: "",
         customerType: ""
+    });
+
+    const [pagination, setPagination] = useState({
+        page: 1,
+        itemsPerPage: 10
     });
 
     const [deleteCustomer] = useDeleteCustomerMutation();
@@ -92,6 +97,26 @@ const ManageCustomers = () => {
             return matchesSearch && matchesServiceType && matchesCustomerType;
         });
     }, [customers?.data, filters.search, filters.serviceType, filters.customerType]);
+
+    // Pagination logic
+    const paginatedCustomers = useMemo(() => {
+        const startIndex = (pagination.page - 1) * pagination.itemsPerPage;
+        const endIndex = startIndex + pagination.itemsPerPage;
+        return filteredCustomers.slice(startIndex, endIndex);
+    }, [filteredCustomers, pagination.page, pagination.itemsPerPage]);
+
+    const totalPages = Math.ceil(filteredCustomers.length / pagination.itemsPerPage);
+
+    const handlePageChange = (event: React.ChangeEvent<unknown>, newPage: number) => {
+        setPagination(prev => ({ ...prev, page: newPage }));
+    };
+
+    const handleItemsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setPagination({
+            page: 1,
+            itemsPerPage: parseInt(event.target.value)
+        });
+    };
 
     const onSubmit = async (values: FieldValues) => {
         values.quantity = Number(values.quantity);
@@ -293,7 +318,7 @@ const ManageCustomers = () => {
 
                             <TableBody>
                                 {
-                                    filteredCustomers.map((customer: any) => (
+                                    paginatedCustomers.map((customer: any) => (
                                         <TableRow
                                             key={customer.customerId}
                                             className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-300"
@@ -340,15 +365,15 @@ const ManageCustomers = () => {
                                             </TableCell>
                                             <TableCell className="py-4">
                                                 <div className="flex gap-2">
-                                                    <IconButton
-                                                        size="medium"
-                                                        className="bg-blue-100 hover:bg-blue-200 text-blue-600 transition-all duration-300 hover:scale-110"
-                                                        onClick={() => {
-                                                            // Handle edit
-                                                        }}
-                                                    >
-                                                        <EditIcon />
-                                                    </IconButton>
+                                                    <Link href={`/manage-customers/${customer._id}`}>
+                                                        <IconButton
+                                                            size="medium"
+                                                            className="bg-blue-100 hover:bg-blue-200 text-blue-600 transition-all duration-300 hover:scale-110"
+                                                            title="গ্রাহক সম্পাদনা করুন"
+                                                        >
+                                                            <EditIcon />
+                                                        </IconButton>
+                                                    </Link>
                                                     <IconButton
                                                         size="medium"
                                                         className="bg-red-100 hover:bg-red-200 text-red-600 transition-all duration-300 hover:scale-110"
@@ -389,6 +414,82 @@ const ManageCustomers = () => {
                         {(!customers?.data?.length && !isLoading) && <NoDataFound />}
                     </TableContainer>
                 </motion.div>
+
+                {/* Enhanced Pagination Section */}
+                {filteredCustomers.length > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.5 }}
+                        className="mt-8"
+                    >
+                        <Paper
+                            elevation={8}
+                            className="p-6 bg-gradient-to-r from-white to-blue-50 border border-blue-100 rounded-2xl"
+                        >
+                            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                                {/* Pagination Info */}
+                                <div className="flex items-center gap-4">
+                                    <Typography variant="body1" className="text-gray-700 font-medium">
+                                        📄 পেজ {pagination.page} of {totalPages}
+                                    </Typography>
+                                    <Typography variant="body2" className="text-gray-500">
+                                        (মোট {filteredCustomers.length} জন গ্রাহক)
+                                    </Typography>
+                                </div>
+
+                                {/* Items Per Page */}
+                                <div className="flex items-center gap-3">
+                                    <Typography variant="body2" className="text-gray-600">
+                                        প্রতি পেজে:
+                                    </Typography>
+                                    <TextField
+                                        select
+                                        size="small"
+                                        value={pagination.itemsPerPage}
+                                        onChange={handleItemsPerPageChange}
+                                        className="min-w-[80px]"
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                borderRadius: '8px',
+                                            },
+                                        }}
+                                    >
+                                        <MenuItem value={5}>5</MenuItem>
+                                        <MenuItem value={10}>10</MenuItem>
+                                        <MenuItem value={20}>20</MenuItem>
+                                        <MenuItem value={50}>50</MenuItem>
+                                    </TextField>
+                                </div>
+
+                                {/* Pagination Controls */}
+                                <Pagination
+                                    count={totalPages}
+                                    page={pagination.page}
+                                    onChange={handlePageChange}
+                                    color="primary"
+                                    size="large"
+                                    sx={{
+                                        '& .MuiPaginationItem-root': {
+                                            borderRadius: '12px',
+                                            fontWeight: 'bold',
+                                            '&:hover': {
+                                                backgroundColor: '#e0e7ff',
+                                            },
+                                            '&.Mui-selected': {
+                                                background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                                color: 'white',
+                                                '&:hover': {
+                                                    background: 'linear-gradient(135deg, #5856eb 0%, #7c3aed 100%)',
+                                                },
+                                            },
+                                        },
+                                    }}
+                                />
+                            </div>
+                        </Paper>
+                    </motion.div>
+                )}
 
                 {/* Enhanced Modal */}
                 <Modal

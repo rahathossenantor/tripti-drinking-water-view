@@ -4,7 +4,7 @@
 import React, { useState, useMemo } from "react";
 import {
     Container, Typography, Paper, Table, TableBody, TableCell,
-    TableContainer, TableHead, TableRow, Chip, TextField, MenuItem, Stack, IconButton, Card, CardContent
+    TableContainer, TableHead, TableRow, Chip, TextField, MenuItem, Stack, IconButton, Card, CardContent, Pagination
 } from "@mui/material";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import { motion } from "framer-motion";
@@ -26,6 +26,11 @@ const ManageSales = () => {
         serviceType: "",
         paymentStatus: "",
         search: ""
+    });
+
+    const [pagination, setPagination] = useState({
+        page: 1,
+        itemsPerPage: 10
     });
 
     const handlePaymentStatusUpdate = async (id: string) => {
@@ -91,6 +96,26 @@ const ManageSales = () => {
             return matchesCustomerType && matchesServiceType && matchesPaymentStatus && matchesSearch;
         });
     }, [orders?.data, filters]);
+
+    // Pagination logic
+    const paginatedOrders = useMemo(() => {
+        const startIndex = (pagination.page - 1) * pagination.itemsPerPage;
+        const endIndex = startIndex + pagination.itemsPerPage;
+        return filteredOrders.slice(startIndex, endIndex);
+    }, [filteredOrders, pagination.page, pagination.itemsPerPage]);
+
+    const totalPages = Math.ceil(filteredOrders.length / pagination.itemsPerPage);
+
+    const handlePageChange = (event: React.ChangeEvent<unknown>, newPage: number) => {
+        setPagination(prev => ({ ...prev, page: newPage }));
+    };
+
+    const handleItemsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setPagination({
+            page: 1,
+            itemsPerPage: parseInt(event.target.value)
+        });
+    };
 
     const handleFilterChange = (field: string, value: string) => {
         setFilters(prev => ({ ...prev, [field]: value }));
@@ -372,7 +397,7 @@ const ManageSales = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {filteredOrders.map((order: any) => (
+                                {paginatedOrders.map((order: any) => (
                                     <TableRow
                                         key={order._id}
                                         className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-300"
@@ -462,6 +487,82 @@ const ManageSales = () => {
                         {(!filteredOrders.length && !isLoading) && <NoDataFound />}
                     </TableContainer>
                 </motion.div>
+
+                {/* Enhanced Pagination Section */}
+                {filteredOrders.length > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.5 }}
+                        className="mt-8"
+                    >
+                        <Paper
+                            elevation={8}
+                            className="p-6 bg-gradient-to-r from-white to-blue-50 border border-blue-100 rounded-2xl"
+                        >
+                            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                                {/* Pagination Info */}
+                                <div className="flex items-center gap-4">
+                                    <Typography variant="body1" className="text-gray-700 font-medium">
+                                        📄 পেজ {pagination.page} of {totalPages}
+                                    </Typography>
+                                    <Typography variant="body2" className="text-gray-500">
+                                        (মোট {filteredOrders.length} টি অর্ডার)
+                                    </Typography>
+                                </div>
+
+                                {/* Items Per Page */}
+                                <div className="flex items-center gap-3">
+                                    <Typography variant="body2" className="text-gray-600">
+                                        প্রতি পেজে:
+                                    </Typography>
+                                    <TextField
+                                        select
+                                        size="small"
+                                        value={pagination.itemsPerPage}
+                                        onChange={handleItemsPerPageChange}
+                                        className="min-w-[80px]"
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                borderRadius: '8px',
+                                            },
+                                        }}
+                                    >
+                                        <MenuItem value={5}>5</MenuItem>
+                                        <MenuItem value={10}>10</MenuItem>
+                                        <MenuItem value={20}>20</MenuItem>
+                                        <MenuItem value={50}>50</MenuItem>
+                                    </TextField>
+                                </div>
+
+                                {/* Pagination Controls */}
+                                <Pagination
+                                    count={totalPages}
+                                    page={pagination.page}
+                                    onChange={handlePageChange}
+                                    color="primary"
+                                    size="large"
+                                    sx={{
+                                        '& .MuiPaginationItem-root': {
+                                            borderRadius: '12px',
+                                            fontWeight: 'bold',
+                                            '&:hover': {
+                                                backgroundColor: '#e0e7ff',
+                                            },
+                                            '&.Mui-selected': {
+                                                background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                                color: 'white',
+                                                '&:hover': {
+                                                    background: 'linear-gradient(135deg, #5856eb 0%, #7c3aed 100%)',
+                                                },
+                                            },
+                                        },
+                                    }}
+                                />
+                            </div>
+                        </Paper>
+                    </motion.div>
+                )}
             </Container>
         </div>
     );

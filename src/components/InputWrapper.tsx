@@ -17,6 +17,7 @@ const InputWrapper = ({
     type = "text",
     fullWidth = true,
     multiline = false,
+    required = false,
     sx = {}
 }: TInputWrapperProps
 ) => {
@@ -39,6 +40,7 @@ const InputWrapper = ({
                     rows={multiline ? 4 : 1}
                     type={type}
                     fullWidth={fullWidth}
+                    required={required}
                     error={!!error?.message}
                     helperText={error?.message}
                     sx={sx}

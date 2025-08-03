@@ -1,62 +1,94 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { Button, Container, Typography, Card, CardContent } from "@mui/material";
-import { FieldValues } from "react-hook-form";
+import React from "react";
+import { Container, Typography, Button, Card, CardContent, Alert } from "@mui/material";
 import { motion } from "framer-motion";
-import { UserPlus, ArrowLeft, Users, Phone, Building } from "lucide-react";
-// import { z } from "zod";
-// import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowLeft, Users, Phone, Building, Save } from "lucide-react";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import { useGetSingleCustomerQuery, useUpdateCustomerMutation } from "@/redux/api/customersAPI";
 import FormWrapper from "@/components/FormWrapper";
 import InputWrapper from "@/components/InputWrapper";
 import InputSelectWrapper from "@/components/InputSelectWrapper";
-import Link from "next/link";
-import { useCreateCustomerMutation } from "@/redux/api/customersAPI";
+import Loader from "@/components/Loader";
+import { FieldValues } from "react-hook-form";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import Spinner from "@/components/Spinner";
 
-// const customerSchema = z.object({
-//     name: z.string().min(2, "Name must be be given"),
-//     email: z.string().optional(),
-//     phone: z.string().min(11, "Phone number must be at least 11 digits"),
-//     productPrice: z.string(),
-//     deliveryAddress: z.string().min(5, "Address must be given"),
-//     customerType: z.enum(["Residential", "Business"]),
-//     serviceType: z.enum(["Daily", "Weekly", "Monthly"])
-// });
-
-const AddCustomer = () => {
-    const [createCustomer, { isLoading }] = useCreateCustomerMutation();
+const EditCustomer = () => {
+    const params = useParams();
     const router = useRouter();
+    const customerId = params.id as string;
+
+    const { data: customer, isLoading, error } = useGetSingleCustomerQuery(customerId);
+    const [updateCustomer, { isLoading: isUpdating }] = useUpdateCustomerMutation();
 
     const onSubmit = async (values: FieldValues) => {
-        values.productPrice = Number(values.productPrice);
-        const toastId = toast.loading("Creating customer...");
+        const toastId = toast.loading("গ্রাহকের তথ্য আপডেট করা হচ্ছে...");
 
         if (!values.email) {
             delete values.email;
-        };
+        }
 
         if (!values.deliveryAddress) {
             values.deliveryAddress = "N/A";
         }
 
         try {
-            const res = await createCustomer(values).unwrap();
-            toast.success(res?.message, { id: toastId, duration: 2000 });
+            const res = await updateCustomer({
+                id: customerId,
+                data: {
+                    ...values,
+                    productPrice: Number(values.productPrice)
+                }
+            }).unwrap();
 
-            // Redirect to the customer list page
+            toast.success(res?.message || "গ্রাহকের তথ্য সফলভাবে আপডেট হয়েছে", {
+                id: toastId,
+                duration: 2000
+            });
+
+            // Redirect back to customers list after success
             const redirectTimeout = setTimeout(() => {
                 router.push("/manage-customers");
             }, 1500);
             return () => clearTimeout(redirectTimeout);
 
         } catch (error: any) {
-            console.error("Error submitting form:", error);
-            toast.error(error?.message || error?.data?.message, { id: toastId });
+            console.error("Error updating customer:", error);
+            toast.error(error?.message || error?.data?.message || "আপডেট করতে সমস্যা হয়েছে!", {
+                id: toastId
+            });
         }
     };
+
+    if (isLoading) {
+        return (
+            <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen flex items-center justify-center">
+                <Loader />
+            </div>
+        );
+    }
+
+    if (error || !customer?.data) {
+        return (
+            <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen">
+                <Container maxWidth="md" className="py-8">
+                    <Alert severity="error" className="mt-8">
+                        গ্রাহকের তথ্য পাওয়া যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন।
+                    </Alert>
+                    <div className="mt-4">
+                        <Link href="/manage-customers">
+                            <Button variant="outlined" startIcon={<ArrowLeft />}>
+                                পেছনে যান
+                            </Button>
+                        </Link>
+                    </div>
+                </Container>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen">
@@ -67,7 +99,7 @@ const AddCustomer = () => {
                 transition={{ duration: 0.6 }}
                 className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 shadow-2xl"
             >
-                <Container maxWidth="lg">
+                <Container maxWidth="xl">
                     <div className="py-6">
                         <motion.div
                             initial={{ x: -20, opacity: 0 }}
@@ -76,7 +108,7 @@ const AddCustomer = () => {
                             className="flex items-center justify-between"
                         >
                             <Link
-                                href="/"
+                                href="/manage-customers"
                                 className="flex items-center gap-2 text-white hover:text-blue-100 font-semibold transition-colors duration-300 group"
                             >
                                 <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform duration-300" />
@@ -84,12 +116,12 @@ const AddCustomer = () => {
                             </Link>
                             <div className="text-center">
                                 <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-3">
-                                    <UserPlus className="w-8 h-8" />
-                                    নতুন কাস্টমার যোগ করুন
+                                    <Users className="w-8 h-8" />
+                                    গ্রাহক সম্পাদনা
                                 </h1>
-                                <p className="text-blue-100 mt-1">গ্রাহক তথ্য পূরণ করুন</p>
+                                <p className="text-blue-100 mt-1">গ্রাহকের তথ্য আপডেট করুন</p>
                             </div>
-                            <div className="w-20"></div> {/* Spacer for centering */}
+                            <div className="w-20"></div> {/* Spacer for alignment */}
                         </motion.div>
                     </div>
                 </Container>
@@ -122,7 +154,7 @@ const AddCustomer = () => {
                                         কাস্টমার তথ্য ফর্ম
                                     </Typography>
                                     <Typography className="text-blue-100">
-                                        নিচের ফর্মটি পূরণ করে নতুন গ্রাহক যোগ করুন
+                                        নিচের ফর্মটি পূরণ করে গ্রাহকের তথ্য আপডেট করুন
                                     </Typography>
                                 </motion.div>
                             </div>
@@ -137,14 +169,9 @@ const AddCustomer = () => {
                                 <FormWrapper
                                     onSubmit={onSubmit}
                                     // resolver={zodResolver(customerSchema)}
-                                    defaultValues={{
-                                        name: "",
-                                        phone: "",
-                                        productPrice: 0,
-                                        deliveryAddress: "",
-                                        customerType: "Residential",
-                                        serviceType: "Daily"
-                                    }}
+                                    defaultValues={
+                                        customer?.data
+                                    }
                                 >
                                     <div className="space-y-8">
                                         {/* Personal Information Section */}
@@ -241,6 +268,7 @@ const AddCustomer = () => {
                                                     label="ঠিকানা"
                                                     name="deliveryAddress"
                                                     multiline
+                                                    required
                                                 />
                                             </motion.div>
                                         </motion.div>
@@ -293,31 +321,34 @@ const AddCustomer = () => {
                                         <motion.div
                                             initial={{ opacity: 0, y: 20 }}
                                             animate={{ opacity: 1, y: 0 }}
-                                            transition={{ duration: 0.5, delay: 1.7 }}
+                                            transition={{ duration: 0.5, delay: 0.6 }}
                                             className="pt-6"
                                         >
                                             <Button
                                                 type="submit"
                                                 variant="contained"
-                                                fullWidth
                                                 size="large"
-                                                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 py-4 text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+                                                disabled={isUpdating}
+                                                className="w-full py-4 text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
                                                 sx={{
                                                     textTransform: 'none',
                                                     borderRadius: '12px',
                                                     padding: '16px 0',
                                                     fontSize: '18px',
                                                     fontWeight: 'bold',
-                                                    background: 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)',
+                                                    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
                                                     '&:hover': {
-                                                        background: 'linear-gradient(135deg, #2563eb 0%, #4f46e5 100%)',
+                                                        background: 'linear-gradient(135deg, #5856eb 0%, #7c3aed 100%)',
                                                         transform: 'scale(1.02)',
+                                                    },
+                                                    '&:disabled': {
+                                                        background: '#9ca3af',
                                                     },
                                                 }}
                                             >
-                                                <div className="flex items-center gap-2">
-                                                    <UserPlus className="w-6 h-6" />
-                                                    {isLoading ? <Spinner /> : "গ্রাহক যোগ করুন"}
+                                                <div className="flex items-center gap-3">
+                                                    <Save className="w-6 h-6" />
+                                                    {isUpdating ? <Spinner /> : "তথ্য আপডেট করুন"}
                                                 </div>
                                             </Button>
                                         </motion.div>
@@ -332,4 +363,4 @@ const AddCustomer = () => {
     );
 };
 
-export default AddCustomer;
+export default EditCustomer;
