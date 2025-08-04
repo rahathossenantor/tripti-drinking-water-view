@@ -3,10 +3,9 @@
 
 import React, { useState, useMemo } from "react";
 import { Container, Typography, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Chip, Button, Stack, TextField, MenuItem, Card, CardContent, Pagination } from "@mui/material";
-import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import Modal from "@mui/material/Modal";
 import { motion, AnimatePresence } from "framer-motion";
-import { Users, Search, Filter, ArrowLeft, ExternalLink, Droplets } from "lucide-react";
+import { Users, Search, Filter, ArrowLeft, ExternalLink, Droplets, EyeIcon } from "lucide-react";
 import Link from "next/link";
 import { useDeleteCustomerMutation, useGetCustomersQuery } from "@/redux/api/customersAPI";
 import FormWrapper from "@/components/FormWrapper";
@@ -311,7 +310,8 @@ const ManageCustomers = () => {
                                     <TableCell className="font-bold text-white text-lg">🏠 ধরণ</TableCell>
                                     <TableCell className="font-bold text-white text-lg">📅 ডেলিভারি</TableCell>
                                     <TableCell className="font-bold text-white text-lg">💰 মূল্য</TableCell>
-                                    <TableCell className="font-bold text-white text-lg">⚙️ একশন</TableCell>
+                                    {/* <TableCell className="font-bold text-white text-lg">⚙️ একশন</TableCell> */}
+                                    <TableCell className="font-bold text-white text-lg">⚙️ Profile</TableCell>
                                     <TableCell className="font-bold text-white text-lg">💧 বিক্রি</TableCell>
                                 </TableRow>
                             </TableHead>
@@ -363,7 +363,20 @@ const ManageCustomers = () => {
                                             <TableCell className="py-4 font-bold text-green-600 text-lg">
                                                 ৳{customer.productPrice}
                                             </TableCell>
+
                                             <TableCell className="py-4">
+                                                <Link href={`/manage-customers/profile/${customer._id}`}>
+                                                    <IconButton
+                                                        size="medium"
+                                                        className="bg-blue-100 hover:bg-blue-200 text-blue-600 transition-all duration-300 hover:scale-110"
+                                                        title="গ্রাহক প্রোফাইল"
+                                                    >
+                                                        <EyeIcon />
+                                                    </IconButton>
+                                                </Link>
+                                            </TableCell>
+
+                                            {/* <TableCell className="py-4">
                                                 <div className="flex gap-2">
                                                     <Link href={`/manage-customers/${customer._id}`}>
                                                         <IconButton
@@ -377,6 +390,7 @@ const ManageCustomers = () => {
                                                     <IconButton
                                                         size="medium"
                                                         className="bg-red-100 hover:bg-red-200 text-red-600 transition-all duration-300 hover:scale-110"
+                                                        title="গ্রাহক মুছে ফেলুন"
                                                         onClick={() => {
                                                             handleDelete(customer._id);
                                                         }}
@@ -384,7 +398,7 @@ const ManageCustomers = () => {
                                                         <DeleteIcon />
                                                     </IconButton>
                                                 </div>
-                                            </TableCell>
+                                            </TableCell> */}
                                             <TableCell className="py-4">
                                                 <Button
                                                     onClick={() => handleOpen(customer)}

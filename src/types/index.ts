@@ -20,4 +20,5 @@ export type TOrder = {
     customer: string;
     quantity: number;
     totalPrice: number;
+    createdAt?: string;
 };

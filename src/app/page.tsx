@@ -222,7 +222,7 @@ const Dashboard = () => {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="mb-10"
         >
-          <div className="grid xl:grid-cols-4 lg:grid-cols-4 md:grid-cols-2 gap-6">
+          <div className="grid xl:grid-cols-3 lg:grid-cols-3 md:grid-cols-2 gap-6">
             <motion.div
               whileHover={{ scale: 1.05, y: -5 }}
               whileTap={{ scale: 0.95 }}
@@ -263,21 +263,6 @@ const Dashboard = () => {
                   <div className="flex items-center justify-center gap-2">
                     <span className="text-2xl">📊</span>
                     সেলস ব্যবস্থাপনা
-                  </div>
-                </button>
-              </Link>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ scale: 1.05, y: -5 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Link href="/">
-                <button className="w-full py-6 px-4 rounded-2xl text-lg font-bold text-white bg-gradient-to-r from-yellow-500 to-orange-600 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:from-yellow-600 hover:to-orange-700 cursor-pointer">
-                  <div className="flex items-center justify-center gap-2">
-                    <span className="text-2xl">🔄</span>
-                    প্রোডাক্ট আপডেট
                   </div>
                 </button>
               </Link>

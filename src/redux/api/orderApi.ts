@@ -17,6 +17,13 @@ const orderApi = baseApi.injectEndpoints({
             }),
             providesTags: ["orders"],
         }),
+        getCustomersOrders: build.query({
+            query: (customerId) => ({
+                url: `/orders/${customerId}`,
+                method: "GET",
+            }),
+            providesTags: ["orders"],
+        }),
         updateOrderPaymentStatus: build.mutation({
             query: ({ id }) => ({
                 url: `/orders/${id}`,
@@ -38,6 +45,7 @@ const orderApi = baseApi.injectEndpoints({
 export const {
     useCreateOrderMutation,
     useGetOrdersQuery,
+    useGetCustomersOrdersQuery,
     useUpdateOrderPaymentStatusMutation,
     useDeleteOrderMutation,
 } = orderApi;
