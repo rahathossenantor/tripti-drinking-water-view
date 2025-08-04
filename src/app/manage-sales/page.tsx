@@ -7,7 +7,7 @@ import {
     TableContainer, TableHead, TableRow, Chip, TextField, MenuItem, Stack, IconButton, Card, CardContent, Pagination
 } from "@mui/material";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { TrendingUp, Search, Filter, ArrowLeft, ExternalLink, Receipt, DollarSign } from "lucide-react";
 import Link from "next/link";
 import { useGetOrdersQuery, useUpdateOrderPaymentStatusMutation, useDeleteOrderMutation } from "@/redux/api/orderApi";
@@ -25,7 +25,10 @@ const ManageSales = () => {
         customerType: "",
         serviceType: "",
         paymentStatus: "",
-        search: ""
+        search: "",
+        dateFilter: "all-time", // New date filter
+        selectedDate: new Date().toISOString().split('T')[0], // For specific date
+        selectedMonth: new Date().toISOString().slice(0, 7) // For specific month
     });
 
     const [pagination, setPagination] = useState({
@@ -82,6 +85,31 @@ const ManageSales = () => {
         });
     };
 
+    // Date utility functions
+    const isToday = (dateString: string) => {
+        const today = new Date();
+        const orderDate = new Date(dateString);
+        return today.toDateString() === orderDate.toDateString();
+    };
+
+    const isThisMonth = (dateString: string) => {
+        const today = new Date();
+        const orderDate = new Date(dateString);
+        return today.getMonth() === orderDate.getMonth() && today.getFullYear() === orderDate.getFullYear();
+    };
+
+    const isSameDate = (date1: string, date2: string) => {
+        const d1 = new Date(date1);
+        const d2 = new Date(date2);
+        return d1.toDateString() === d2.toDateString();
+    };
+
+    const isSameMonth = (date1: string, date2: string) => {
+        const d1 = new Date(date1);
+        const d2 = new Date(date2);
+        return d1.getMonth() === d2.getMonth() && d1.getFullYear() === d2.getFullYear();
+    };
+
     const filteredOrders = useMemo(() => {
         if (!orders?.data) return [];
 
@@ -93,7 +121,28 @@ const ManageSales = () => {
                 order.customer.name.toLowerCase().includes(filters.search.toLowerCase()) ||
                 order.customer.phone.includes(filters.search);
 
-            return matchesCustomerType && matchesServiceType && matchesPaymentStatus && matchesSearch;
+            // Date filtering
+            let matchesDate = true;
+            if (order.createdAt) {
+                switch (filters.dateFilter) {
+                    case "today":
+                        matchesDate = isToday(order.createdAt);
+                        break;
+                    case "selected-day":
+                        matchesDate = isSameDate(order.createdAt, filters.selectedDate);
+                        break;
+                    case "this-month":
+                        matchesDate = isThisMonth(order.createdAt);
+                        break;
+                    case "selected-month":
+                        matchesDate = isSameMonth(order.createdAt, filters.selectedMonth + '-01');
+                        break;
+                    default: // "all-time"
+                        matchesDate = true;
+                }
+            }
+
+            return matchesCustomerType && matchesServiceType && matchesPaymentStatus && matchesSearch && matchesDate;
         });
     }, [orders?.data, filters]);
 
@@ -359,7 +408,84 @@ const ManageSales = () => {
                                 <MenuItem value="Paid">✅ পরিশোধিত</MenuItem>
                                 <MenuItem value="Due">⏳ বকেয়া</MenuItem>
                             </TextField>
+                            <TextField
+                                select
+                                label="তারিখ ভিত্তিক ফিল্টার"
+                                size="medium"
+                                value={filters.dateFilter}
+                                onChange={(e) => handleFilterChange('dateFilter', e.target.value)}
+                                className="flex-1 min-w-[200px]"
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: '12px',
+                                    },
+                                }}
+                            >
+                                <MenuItem value="all">📅 সব অর্ডার</MenuItem>
+                                <MenuItem value="today">🌟 আজকের অর্ডার</MenuItem>
+                                <MenuItem value="selected-day">📆 নির্দিষ্ট দিনের অর্ডার</MenuItem>
+                                <MenuItem value="this-month">🗓️ এই মাসের অর্ডার</MenuItem>
+                                <MenuItem value="selected-month">📊 নির্দিষ্ট মাসের অর্ডার</MenuItem>
+                            </TextField>
                         </Stack>
+
+                        {/* Conditional Date Pickers */}
+                        <AnimatePresence>
+                            {(filters.dateFilter === 'selected-day' || filters.dateFilter === 'selected-month') && (
+                                <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    transition={{ duration: 0.3 }}
+                                    className="mt-4"
+                                >
+                                    <Stack direction={{ xs: "column", md: "row" }} spacing={3}>
+                                        {filters.dateFilter === 'selected-day' && (
+                                            <TextField
+                                                type="date"
+                                                label="তারিখ নির্বাচন করুন"
+                                                value={filters.selectedDate}
+                                                onChange={(e) => handleFilterChange('selectedDate', e.target.value)}
+                                                className="flex-1 min-w-[250px]"
+                                                InputLabelProps={{ shrink: true }}
+                                                sx={{
+                                                    '& .MuiOutlinedInput-root': {
+                                                        borderRadius: '12px',
+                                                        '&:hover fieldset': {
+                                                            borderColor: '#4f46e5',
+                                                        },
+                                                        '&.Mui-focused fieldset': {
+                                                            borderColor: '#4f46e5',
+                                                        },
+                                                    },
+                                                }}
+                                            />
+                                        )}
+                                        {filters.dateFilter === 'selected-month' && (
+                                            <TextField
+                                                type="month"
+                                                label="মাস নির্বাচন করুন"
+                                                value={filters.selectedMonth}
+                                                onChange={(e) => handleFilterChange('selectedMonth', e.target.value)}
+                                                className="flex-1 min-w-[250px]"
+                                                InputLabelProps={{ shrink: true }}
+                                                sx={{
+                                                    '& .MuiOutlinedInput-root': {
+                                                        borderRadius: '12px',
+                                                        '&:hover fieldset': {
+                                                            borderColor: '#4f46e5',
+                                                        },
+                                                        '&.Mui-focused fieldset': {
+                                                            borderColor: '#4f46e5',
+                                                        },
+                                                    },
+                                                }}
+                                            />
+                                        )}
+                                    </Stack>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
 
                         {/* Filter Results Info */}
                         <div className="mt-4 pt-4 border-t border-gray-200">
@@ -368,6 +494,10 @@ const ManageSales = () => {
                                 {orders?.data && orders.data.length !== filteredOrders.length &&
                                     ` (সর্বমোট ${orders.data.length} টির মধ্যে)`
                                 }
+                                {filters.dateFilter === 'today' && ' - আজকের জন্য'}
+                                {filters.dateFilter === 'selected-day' && filters.selectedDate && ` - ${filters.selectedDate} তারিখের জন্য`}
+                                {filters.dateFilter === 'this-month' && ' - এই মাসের জন্য'}
+                                {filters.dateFilter === 'selected-month' && filters.selectedMonth && ` - ${filters.selectedMonth} মাসের জন্য`}
                             </Typography>
                         </div>
                     </Paper>

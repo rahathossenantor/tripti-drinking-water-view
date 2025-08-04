@@ -51,33 +51,6 @@ const ManageCustomers = () => {
         itemsPerPage: 10
     });
 
-    const [deleteCustomer] = useDeleteCustomerMutation();
-
-    const handleDelete = async (id: string) => {
-        Swal.fire({
-            title: "আপনি কি নিশ্চিতভাবে এই কাস্টমারকে ডিলিট করতে চান?",
-            text: "ডিলিট হওয়ার পরে এটি আর পাওয়া যাবে না!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            cancelButtonText: "না, বাতিল করুন।",
-            confirmButtonText: "হ্যাঁ, ডিলিট করুন।"
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                const toastId = toast.loading("ডিলিট করা হচ্ছে...");
-
-                try {
-                    const res = await deleteCustomer(id).unwrap();
-                    toast.success(res?.message, { id: toastId, duration: 2000 });
-                } catch (error: any) {
-                    console.error("Error deleting customer:", error);
-                    toast.error(error?.message || error?.data?.message, { id: toastId });
-                };
-            }
-        });
-    };
-
     const { data: customers, isLoading } = useGetCustomersQuery(undefined);
     const [createOrder] = useCreateOrderMutation();
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 "use client";
 
@@ -23,12 +24,7 @@ import {
     Select,
     MenuItem,
     FormControl,
-    InputLabel,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Snackbar
+    InputLabel
 } from "@mui/material";
 import {
     ArrowLeft,
@@ -42,14 +38,16 @@ import {
     ShoppingCart,
     DollarSign,
     Edit,
-    Trash2,
-    UserX
+    Trash2
 } from "lucide-react";
 import Link from "next/link";
-import { useGetSingleCustomerQuery } from "@/redux/api/customersAPI";
+import { useDeleteCustomerMutation, useGetSingleCustomerQuery } from "@/redux/api/customersAPI";
 import { useGetCustomersOrdersQuery } from "@/redux/api/orderApi";
 import { TOrder } from "@/types";
 import Loader from "@/components/Loader";
+import Swal from "sweetalert2";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 // Date utility functions
 const formatDate = (date: Date) => {
@@ -86,9 +84,6 @@ const Profile = ({ params }: { params: Promise<{ id: string }> }) => {
     const [dateFilter, setDateFilter] = useState<DateFilter>("all-time");
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().split('T')[0]);
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [successMessage, setSuccessMessage] = useState("");
-    const [showSnackbar, setShowSnackbar] = useState(false);
     const ordersPerPage = 10;
 
     const { data: customerData, isLoading: customerLoading, error: customerError } = useGetSingleCustomerQuery(id);
@@ -165,28 +160,35 @@ const Profile = ({ params }: { params: Promise<{ id: string }> }) => {
         });
     };
 
+    const [deleteCustomer] = useDeleteCustomerMutation();
+    const router = useRouter();
+
     // Handle customer deletion
-    const handleDeleteCustomer = async () => {
-        try {
-            // Here you would call your delete API
-            // await deleteCustomerMutation(id);
+    const handleDelete = async (id: string) => {
+        Swal.fire({
+            title: "আপনি কি নিশ্চিতভাবে এই কাস্টমারকে ডিলিট করতে চান?",
+            text: "ডিলিট হওয়ার পরে এটি আর পাওয়া যাবে না!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            cancelButtonText: "না, বাতিল করুন।",
+            confirmButtonText: "হ্যাঁ, ডিলিট করুন।"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const toastId = toast.loading("ডিলিট করা হচ্ছে...");
 
-            setSuccessMessage("কাস্টমার সফলভাবে মুছে ফেলা হয়েছে");
-            setShowSnackbar(true);
-            setDeleteDialogOpen(false);
+                try {
+                    const res = await deleteCustomer(id).unwrap();
+                    toast.success(res?.message, { id: toastId, duration: 2000 });
 
-            // Navigate back to customers list after a short delay
-            setTimeout(() => {
-                window.location.href = "/manage-customers";
-            }, 2000);
-        } catch (error) {
-            console.error("Error deleting customer:", error);
-        }
-    };
-
-    // Handle snackbar close
-    const handleSnackbarClose = () => {
-        setShowSnackbar(false);
+                    router.push("/manage-customers");
+                } catch (error: any) {
+                    console.error("Error deleting customer:", error);
+                    toast.error(error?.message || error?.data?.message, { id: toastId });
+                };
+            }
+        });
     };
 
     if (customerLoading || ordersLoading) {
@@ -315,7 +317,7 @@ const Profile = ({ params }: { params: Promise<{ id: string }> }) => {
                                     <Button
                                         variant="contained"
                                         startIcon={<Trash2 size={20} />}
-                                        onClick={() => setDeleteDialogOpen(true)}
+                                        onClick={() => handleDelete(id)}
                                         sx={{
                                             background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
                                             color: "white",
@@ -767,112 +769,6 @@ const Profile = ({ params }: { params: Promise<{ id: string }> }) => {
                     </Paper>
                 </motion.div>
             </main>
-
-            {/* Delete Confirmation Dialog */}
-            <Dialog
-                open={deleteDialogOpen}
-                onClose={() => setDeleteDialogOpen(false)}
-                maxWidth="sm"
-                fullWidth
-                PaperProps={{
-                    sx: {
-                        borderRadius: 4,
-                        background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
-                    }
-                }}
-            >
-                <DialogTitle sx={{ pb: 2 }}>
-                    <div className="flex items-center gap-3">
-                        <div className="p-3 bg-red-100 rounded-full">
-                            <UserX className="w-6 h-6 text-red-600" />
-                        </div>
-                        <div>
-                            <Typography variant="h6" className="font-bold text-gray-800">
-                                কাস্টমার মুছে ফেলার নিশ্চিতকরণ
-                            </Typography>
-                            <Typography variant="body2" className="text-gray-600 mt-1">
-                                এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না
-                            </Typography>
-                        </div>
-                    </div>
-                </DialogTitle>
-
-                <DialogContent sx={{ pb: 2 }}>
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                        <Typography variant="body1" className="text-red-800 font-medium mb-2">
-                            ⚠️ সতর্কতা: এই কাজটি স্থায়ী
-                        </Typography>
-                        <Typography variant="body2" className="text-red-700">
-                            আপনি &quot;<strong>{customer?.name}</strong>&quot; কাস্টমারকে স্থায়ীভাবে মুছে ফেলতে চলেছেন।
-                            এতে তার সকল অর্ডার ইতিহাসও মুছে যাবে।
-                        </Typography>
-                    </div>
-
-                    <Typography variant="body2" className="text-gray-600">
-                        চালিয়ে যেতে চাইলে &quot;মুছে ফেলুন&quot; বাটনে ক্লিক করুন।
-                    </Typography>
-                </DialogContent>
-
-                <DialogActions sx={{ p: 3, pt: 0 }}>
-                    <Button
-                        onClick={() => setDeleteDialogOpen(false)}
-                        variant="outlined"
-                        sx={{
-                            borderRadius: 2,
-                            px: 3,
-                            py: 1,
-                            borderColor: "#d1d5db",
-                            color: "#6b7280",
-                            "&:hover": {
-                                borderColor: "#9ca3af",
-                                backgroundColor: "#f9fafb"
-                            }
-                        }}
-                    >
-                        বাতিল করুন
-                    </Button>
-                    <Button
-                        onClick={handleDeleteCustomer}
-                        variant="contained"
-                        startIcon={<Trash2 size={16} />}
-                        sx={{
-                            background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
-                            borderRadius: 2,
-                            px: 3,
-                            py: 1,
-                            ml: 2,
-                            "&:hover": {
-                                background: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)",
-                            }
-                        }}
-                    >
-                        মুছে ফেলুন
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            {/* Success Snackbar */}
-            <Snackbar
-                open={showSnackbar}
-                autoHideDuration={6000}
-                onClose={handleSnackbarClose}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            >
-                <Alert
-                    onClose={handleSnackbarClose}
-                    severity="success"
-                    variant="filled"
-                    sx={{
-                        borderRadius: 3,
-                        fontWeight: 600,
-                        "& .MuiAlert-icon": {
-                            fontSize: "1.5rem"
-                        }
-                    }}
-                >
-                    {successMessage}
-                </Alert>
-            </Snackbar>
         </div>
     );
 };
