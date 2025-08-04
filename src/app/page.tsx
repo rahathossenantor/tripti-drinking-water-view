@@ -89,7 +89,7 @@ const Dashboard = () => {
       case "selected-month":
         return `${new Date(selectedMonth + '-01').toLocaleDateString('bn-BD', { month: 'long', year: 'numeric' })} মাসের`;
       default:
-        return "সর্বমোট";
+        return "সব সময়ের";
     }
   };
 
@@ -229,7 +229,7 @@ const Dashboard = () => {
               transition={{ duration: 0.2 }}
             >
               <Link href="/add-customer">
-                <button className="w-full py-6 px-4 rounded-2xl text-lg font-bold text-white bg-gradient-to-r from-green-500 to-emerald-600 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:from-green-600 hover:to-emerald-700">
+                <button className="w-full py-6 px-4 rounded-2xl text-lg font-bold text-white bg-gradient-to-r from-green-500 to-emerald-600 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:from-green-600 hover:to-emerald-700 cursor-pointer">
                   <div className="flex items-center justify-center gap-2">
                     <span className="text-2xl">👤</span>
                     ক্রেতা যোগ করুন
@@ -244,7 +244,7 @@ const Dashboard = () => {
               transition={{ duration: 0.2 }}
             >
               <Link href="/manage-customers">
-                <button className="w-full py-6 px-4 rounded-2xl text-lg font-bold text-white bg-gradient-to-r from-red-500 to-pink-600 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:from-red-600 hover:to-pink-700">
+                <button className="w-full py-6 px-4 rounded-2xl text-lg font-bold text-white bg-gradient-to-r from-red-500 to-pink-600 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:from-red-600 hover:to-pink-700 cursor-pointer">
                   <div className="flex items-center justify-center gap-2">
                     <span className="text-2xl">👥</span>
                     কাস্টমার ব্যবস্থাপনা
@@ -259,7 +259,7 @@ const Dashboard = () => {
               transition={{ duration: 0.2 }}
             >
               <Link href="/manage-sales">
-                <button className="w-full py-6 px-4 rounded-2xl text-lg font-bold text-white bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:from-blue-600 hover:to-indigo-700">
+                <button className="w-full py-6 px-4 rounded-2xl text-lg font-bold text-white bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:from-blue-600 hover:to-indigo-700 cursor-pointer">
                   <div className="flex items-center justify-center gap-2">
                     <span className="text-2xl">📊</span>
                     সেলস ব্যবস্থাপনা
@@ -273,8 +273,8 @@ const Dashboard = () => {
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.2 }}
             >
-              <Link href="/dashboard/manage-students">
-                <button className="w-full py-6 px-4 rounded-2xl text-lg font-bold text-white bg-gradient-to-r from-yellow-500 to-orange-600 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:from-yellow-600 hover:to-orange-700">
+              <Link href="/">
+                <button className="w-full py-6 px-4 rounded-2xl text-lg font-bold text-white bg-gradient-to-r from-yellow-500 to-orange-600 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:from-yellow-600 hover:to-orange-700 cursor-pointer">
                   <div className="flex items-center justify-center gap-2">
                     <span className="text-2xl">🔄</span>
                     প্রোডাক্ট আপডেট
@@ -462,7 +462,7 @@ const Dashboard = () => {
             <div className="space-y-4">
               <AnimatePresence>
                 {
-                  filteredOrders?.slice(0, 10)?.map((order: any, idx: number) => (
+                  filteredOrders?.slice(-10)?.reverse()?.map((order: any, idx: number) => (
                     <motion.div
                       key={idx}
                       initial={{ opacity: 0, x: -20 }}
